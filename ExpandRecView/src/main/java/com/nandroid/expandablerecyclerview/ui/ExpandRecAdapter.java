@@ -18,6 +18,7 @@ public abstract class ExpandRecAdapter<A,B,T extends RecyclerView.ViewHolder,U e
 
     private OnToggleListener expandCollapseListener;
 
+
     public ExpandRecAdapter(ArrayList<ExpandableGroup<A,B>> groups){
         this.groups = groups;
     }
@@ -33,7 +34,7 @@ public abstract class ExpandRecAdapter<A,B,T extends RecyclerView.ViewHolder,U e
 
         if (needsOpen && parentHolder.itemView instanceof ViewGroup){
 
-            ExpandChildRecAdapter<U> childRecAdapter = new ExpandChildRecAdapter<U>() {
+            final ExpandChildRecAdapter<U> childRecAdapter = new ExpandChildRecAdapter<U>() {
                 @NonNull
                 @Override
                 public U onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -42,7 +43,12 @@ public abstract class ExpandRecAdapter<A,B,T extends RecyclerView.ViewHolder,U e
 
                 @Override
                 public void onBindViewHolder(@NonNull U childHolder, int position) {
-                    ExpandRecAdapter.this.onBindChildViewHolder(childHolder,parentHolder,viewType,position);
+                    ExpandRecAdapter.this.onBindChildViewHolder(
+                            childHolder,
+                            parentHolder,
+                            this,
+                            viewType,
+                            position);
                 }
 
                 @Override
@@ -100,7 +106,13 @@ public abstract class ExpandRecAdapter<A,B,T extends RecyclerView.ViewHolder,U e
 
     public abstract void onBindParentViewHolder(@NonNull T holder, final int groupPosition);
 
-    public abstract void onBindChildViewHolder(@NonNull U childHolder,@NonNull T parentHolder, final int groupPosition,final int childPosition);
+    public abstract void onBindChildViewHolder(
+            @NonNull U childHolder,
+            @NonNull T parentHolder,
+            ExpandChildRecAdapter<U> childRecAdapter,
+            final int groupPosition,
+            final int childPosition
+    );
 
 
     public void toggleSection(int position){
@@ -113,6 +125,11 @@ public abstract class ExpandRecAdapter<A,B,T extends RecyclerView.ViewHolder,U e
 
     public void setOnToggledListener(OnToggleListener listener){
         this.expandCollapseListener = listener;
+    }
+
+
+    public void notifyGroupChanged(int groupPosition){
+        this.notifyItemChanged(groupPosition);
     }
 
 }
