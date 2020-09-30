@@ -1,0 +1,3 @@
+include ':ExpandRecView'
+//include ':app'
+//rootProject.name = "ExpandableRecyclerView"
