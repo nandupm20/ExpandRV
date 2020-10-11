@@ -4,7 +4,6 @@ package com.nandroid.expandablerecyclerview.ui;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -125,6 +124,9 @@ public abstract class ExpandRecAdapter<A,B,T extends RecyclerView.ViewHolder,U e
     );
 
 
+
+
+    /// methods
     public void toggleSection(int position){
         this.groups.get(position).needsOpen = !this.groups.get(position).needsOpen;
         this.notifyItemChanged(position);
@@ -140,15 +142,15 @@ public abstract class ExpandRecAdapter<A,B,T extends RecyclerView.ViewHolder,U e
 
     public void notifyGroupChanged(int groupPosition){
         this.notifyItemChanged(groupPosition);
-        if (groups.get(groupPosition).needsOpen){
+        if (childRecAdapters.get(groupPosition) != null){
             childRecAdapters.get(groupPosition).notifyDataSetChanged();
         }
     }
 
     public void notifyChildSetChanged(){
-        for (int i = 0;i<groups.size();i++){
-            if (childRecAdapters.get(i) != null){
-                childRecAdapters.get(i).notifyDataSetChanged();
+        for (int i = 0;i<childRecAdapters.size();i++){
+            if (childRecAdapters.valueAt(i) != null){
+                childRecAdapters.valueAt(i).notifyDataSetChanged();
             }
         }
     }
