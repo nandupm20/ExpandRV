@@ -4,6 +4,8 @@ package com.nandroid.expandablerecyclerview.ui;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -18,19 +20,25 @@ public abstract class ExpandRecAdapter<A,B,T extends RecyclerView.ViewHolder,U e
 
     private OnToggleListener expandCollapseListener;
 
+    private SparseArray<ExpandChildRecAdapter<U>> childRecAdapters;
+
 
     public ExpandRecAdapter(ArrayList<ExpandableGroup<A,B>> groups){
         this.groups = groups;
+        this.childRecAdapters = new SparseArray<>();
     }
 
 
 
     @NonNull
     @Override
-    public T onCreateViewHolder(@NonNull ViewGroup parent, final int viewType) {
+    public T onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+        final int groupPos = viewType;
+
         final T parentHolder = this.onCreateParentViewHolder(parent);
 
-        boolean needsOpen = this.groups.get(viewType).needsOpen;
+        boolean needsOpen = this.groups.get(groupPos).needsOpen;
 
         if (needsOpen && parentHolder.itemView instanceof ViewGroup){
 
@@ -47,13 +55,13 @@ public abstract class ExpandRecAdapter<A,B,T extends RecyclerView.ViewHolder,U e
                             childHolder,
                             parentHolder,
                             this,
-                            viewType,
+                            groupPos,
                             position);
                 }
 
                 @Override
                 public int getItemCount() {
-                    return ExpandRecAdapter.this.groups.get(viewType).childItems.size();
+                    return ExpandRecAdapter.this.groups.get(groupPos).childItems.size();
                 }
             };
 
@@ -67,6 +75,8 @@ public abstract class ExpandRecAdapter<A,B,T extends RecyclerView.ViewHolder,U e
             ((ViewGroup) parentHolder.itemView).addView(childRecyclerView);
             childRecyclerView.setLayoutManager(new LinearLayoutManager(parent.getContext()));
             childRecyclerView.setAdapter(childRecAdapter);
+
+            childRecAdapters.append(groupPos,childRecAdapter);
 
         }
 
@@ -130,6 +140,32 @@ public abstract class ExpandRecAdapter<A,B,T extends RecyclerView.ViewHolder,U e
 
     public void notifyGroupChanged(int groupPosition){
         this.notifyItemChanged(groupPosition);
+        if (groups.get(groupPosition).needsOpen){
+            childRecAdapters.get(groupPosition).notifyDataSetChanged();
+        }
+    }
+
+    public void notifyChildSetChanged(){
+        for (int i = 0;i<groups.size();i++){
+            if (childRecAdapters.get(i) != null){
+                childRecAdapters.get(i).notifyDataSetChanged();
+            }
+        }
+    }
+
+    public void notifyGroupSetChanged(){
+        this.notifyDataSetChanged();
+    }
+
+    public void notifyAllDataChanged(){
+        this.notifyDataSetChanged();
+        notifyChildSetChanged();
+    }
+
+    public void notifyChildItemChanged(int groupPosition,int childPosition){
+        if (childRecAdapters.get(groupPosition) != null){
+            childRecAdapters.get(groupPosition).notifyItemChanged(childPosition);
+        }
     }
 
 }
