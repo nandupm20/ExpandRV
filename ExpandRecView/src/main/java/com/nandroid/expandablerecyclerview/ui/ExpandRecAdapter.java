@@ -172,7 +172,7 @@ public abstract class ExpandRecAdapter<A,B,T extends RecyclerView.ViewHolder,U e
 
     public void notifyDataChanged(ArrayList<ExpandableGroup<A,B>> groups){
         this.groups = groups;
-        this.notifyChildSetChanged();
+        this.notifyDataSetChanged();
         for (int i=0;i<childRecAdapters.size();i++){
             childRecAdapters.valueAt(i).notifyDataSetChanged();
         }
