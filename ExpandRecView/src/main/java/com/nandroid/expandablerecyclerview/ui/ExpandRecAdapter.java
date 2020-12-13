@@ -98,7 +98,7 @@ public abstract class ExpandRecAdapter<A,B,T extends RecyclerView.ViewHolder,U e
                 ExpandRecAdapter.this.toggleSection(pos);
             }
         });
-        this.onBindParentViewHolder(holder, i);
+        this.onBindParentViewHolder(holder, i,groups.get(i).needsOpen);
     }
 
     @Override
@@ -113,7 +113,7 @@ public abstract class ExpandRecAdapter<A,B,T extends RecyclerView.ViewHolder,U e
 
     public abstract U onCreateChildViewHolder(@NonNull ViewGroup parent);
 
-    public abstract void onBindParentViewHolder(@NonNull T holder, final int groupPosition);
+    public abstract void onBindParentViewHolder(@NonNull T holder, final int groupPosition,boolean isExpanding);
 
     public abstract void onBindChildViewHolder(
             @NonNull U childHolder,
